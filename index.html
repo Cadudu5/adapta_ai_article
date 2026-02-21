@@ -1,0 +1,644 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estrutura de Pesquisa: A Revolução da Inteligência Artificial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutral & Calm Harmony -->
+    <!-- Background: Stone 50 (#fafaf9) to Stone 100 (#f5f5f4) -->
+    <!-- Primary Text: Slate 800 (#1e293b) -->
+    <!-- Accents: Muted Indigo (#6366f1) for interaction, Emerald (#10b981) for safety, Rose (#f43f5e) for risks -->
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Merriweather', 'serif'],
+                    },
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            800: '#292524',
+                        },
+                        slate: {
+                            800: '#1e293b',
+                            600: '#475569',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fafaf9; /* Stone 50 */
+            color: #1e293b; /* Slate 800 */
+        }
+        
+        /* Chart Container Styling per Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Reduced max-width for better reading flow */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        /* Card Interactions */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom Scrollbar for horizontal sections */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .active-tab {
+            border-bottom: 2px solid #6366f1;
+            color: #6366f1;
+            font-weight: 600;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e5e7eb;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Application Structure Plan:
+         1. Header: Simple navigation and Title.
+         2. Hero: Context setting (Goal of presentation).
+         3. Section 1 (History): Uses a Line Chart to visualize the 3 Waves of AI (DARPA model) + Interactive Timeline for milestones.
+         4. Section 2 (Prompt Engineering): A "Methodology Explorer" using cards that reveal details for RACE, CARE, APE. Includes a simulated "Prompt Result" comparison.
+         5. Section 3 (Safety & Ethics): A Tabbed interface to switch between "Regulations" and "Data Privacy" visualization (Flowchart using CSS Grid).
+         6. Conclusion: Summary block.
+         Rationale: This structure breaks dense research into digestible chunks. The 'Waves' chart visualizes abstract concepts. The Prompt section turns acronyms into tools. The Safety section visually maps data flow.
+    -->
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-red-700/95 backdrop-blur-md border-b border-red-800 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex flex-col justify-center">
+                    <span class="font-serif font-bold text-xl text-white">IA: Passado, Presente e Futuro</span>
+                    <span class="text-xs text-red-200 font-medium">Cátedra Sérgio Henrique Ferreira</span>
+                </div>
+                <div class="hidden sm:flex space-x-8">
+                    <button onclick="scrollToSection('contexto')" class="text-red-100 hover:text-white hover:bg-red-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">Histórico & Ondas</button>
+                    <button onclick="scrollToSection('prompt')" class="text-red-100 hover:text-white hover:bg-red-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">Engenharia de Prompt</button>
+                    <button onclick="scrollToSection('seguranca')" class="text-red-100 hover:text-white hover:bg-red-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">Segurança e Ética</button>
+                </div>
+                <!-- Mobile menu button simplified -->
+                <div class="sm:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-red-100 hover:text-white focus:outline-none">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="hidden sm:hidden pb-4">
+                <div class="flex flex-col space-y-2">
+                    <button onclick="scrollToSection('contexto')" class="text-left pl-3 text-red-100 hover:text-white py-2">Histórico & Ondas</button>
+                    <button onclick="scrollToSection('prompt')" class="text-left pl-3 text-red-100 hover:text-white py-2">Engenharia de Prompt</button>
+                    <button onclick="scrollToSection('seguranca')" class="text-left pl-3 text-red-100 hover:text-white py-2">Segurança e Ética</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-20">
+
+        <!-- Hero Section -->
+        <section class="text-center space-y-6">
+            <h1 class="text-4xl sm:text-5xl font-serif font-bold text-stone-900 tracking-tight">
+                A Evolução da Inteligência Artificial
+            </h1>
+            <p class="text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed">
+                Um guia interativo para conscientização sobre os marcos históricos, metodologias de prompt e os desafios éticos da IA moderna.
+            </p>
+            <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-6 max-w-3xl mx-auto mt-8 text-left">
+                <h3 class="text-indigo-800 font-semibold mb-2">Objetivo da Pesquisa:</h3>
+                <p class="text-indigo-700 text-sm">
+                    Este documento digital serve como base para a apresentação direcionada a estatísticos e financiadores do terceiro setor. Focamos em desmistificar o "boom" pós-2020, explicar frameworks práticos (RACE, CARE, APE) e detalhar políticas de segurança de dados.
+                </p>
+            </div>
+        </section>
+
+        <!-- Visualization & Content Choices:
+             - History: Chart.js Line Chart to show "Competence" vs "Time" for the 3 DARPA waves. This helps users visualize WHY the 3rd wave is different (context/adaptation) compared to the 1st (rules).
+             - Interaction: Clicking chart points updates a description box.
+             - Confirmation: NO SVG, NO Mermaid.
+        -->
+
+        <!-- SECTION 1: Contexto Histórico -->
+        <section id="contexto" class="scroll-mt-24 space-y-8">
+            <div class="border-l-4 border-indigo-500 pl-4">
+                <h2 class="text-3xl font-bold text-stone-800">Parte 1: O Contexto Histórico e as 3 Ondas</h2>
+                <p class="mt-2 text-stone-600">Entendendo a evolução desde os sistemas baseados em regras até a IA Generativa Contextual.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Chart Area -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-lg font-semibold mb-4 text-center">As 3 Ondas da IA (Modelo DARPA)</h3>
+                    <div class="chart-container">
+                        <canvas id="wavesChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-xs text-center text-stone-500">
+                        *Eixo Y representa a Capacidade Cognitiva Abstrata (Percepção, Raciocínio, Adaptação).
+                    </div>
+                </div>
+
+                <!-- Info Panel (Dynamic) -->
+                <div class="bg-stone-100 p-6 rounded-xl border border-stone-200 flex flex-col justify-center">
+                    <div id="wave-info">
+                        <h4 class="text-xl font-bold text-indigo-600 mb-3">Clique no gráfico</h4>
+                        <p class="text-stone-600">Selecione uma das ondas no gráfico para ver detalhes sobre suas características, limitações e exemplos históricos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Blocks -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 mt-8">
+                <h3 class="text-lg font-bold mb-6 text-stone-800">Linha do Tempo: Revoluções e Invernos</h3>
+                <div class="relative">
+                    <div class="timeline-line hidden sm:block"></div>
+                    <div class="space-y-8 relative z-10">
+                        <!-- Item 1 -->
+                        <div class="flex flex-col sm:flex-row items-center sm:justify-between group">
+                            <div class="w-full sm:w-5/12 text-center sm:text-right pr-0 sm:pr-8">
+                                <h4 class="font-bold text-stone-800">1950 - 1970</h4>
+                                <p class="text-sm text-stone-500">Nascimento & Otimismo</p>
+                                <p class="text-sm mt-1 text-stone-600">Teste de Turing e os primeiros programas de xadrez. IA Simbólica.</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-indigo-500 border-4 border-white shadow flex items-center justify-center text-white text-xs font-bold my-2 sm:my-0">1</div>
+                            <div class="w-full sm:w-5/12 pl-0 sm:pl-8 opacity-0 sm:opacity-0">Filler</div>
+                        </div>
+                        
+                        <!-- Item 2 -->
+                        <div class="flex flex-col sm:flex-row items-center sm:justify-between group">
+                            <div class="w-full sm:w-5/12 pr-0 sm:pr-8 opacity-0 sm:opacity-0 order-3 sm:order-1">Filler</div>
+                            <div class="w-8 h-8 rounded-full bg-stone-400 border-4 border-white shadow flex items-center justify-center text-white text-xs font-bold my-2 sm:my-0 order-2">2</div>
+                            <div class="w-full sm:w-5/12 text-center sm:text-left pl-0 sm:pl-8 order-1 sm:order-3">
+                                <h4 class="font-bold text-stone-800">1974 - 1980</h4>
+                                <p class="text-sm text-stone-500">O Primeiro Inverno da IA</p>
+                                <p class="text-sm mt-1 text-stone-600">Cortes de financiamento devido a promessas exageradas e falta de poder computacional.</p>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="flex flex-col sm:flex-row items-center sm:justify-between group">
+                            <div class="w-full sm:w-5/12 text-center sm:text-right pr-0 sm:pr-8">
+                                <h4 class="font-bold text-stone-800">2010s</h4>
+                                <p class="text-sm text-stone-500">Deep Learning & Big Data</p>
+                                <p class="text-sm mt-1 text-stone-600">Explosão da 2ª Onda. Reconhecimento de imagem e voz atingem níveis humanos.</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-indigo-500 border-4 border-white shadow flex items-center justify-center text-white text-xs font-bold my-2 sm:my-0">3</div>
+                            <div class="w-full sm:w-5/12 pl-0 sm:pl-8 opacity-0 sm:opacity-0">Filler</div>
+                        </div>
+
+                         <!-- Item 4 -->
+                         <div class="flex flex-col sm:flex-row items-center sm:justify-between group">
+                            <div class="w-full sm:w-5/12 pr-0 sm:pr-8 opacity-0 sm:opacity-0 order-3 sm:order-1">Filler</div>
+                            <div class="w-8 h-8 rounded-full bg-emerald-500 border-4 border-white shadow flex items-center justify-center text-white text-xs font-bold my-2 sm:my-0 order-2">4</div>
+                            <div class="w-full sm:w-5/12 text-center sm:text-left pl-0 sm:pl-8 order-1 sm:order-3">
+                                <h4 class="font-bold text-stone-800">2020 - Presente</h4>
+                                <p class="text-sm text-stone-500">A Era Generativa (3ª Onda)</p>
+                                <p class="text-sm mt-1 text-stone-600">Transformers (GPT). IA contextual, capaz de criar e "entender". O termo explode globalmente.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Engenharia de Prompt -->
+        <!-- Visualization: Interactive Cards for CARE, RACE, APE. Simple DOM manipulation to show details. -->
+        <section id="prompt" class="scroll-mt-24 space-y-8">
+            <div class="border-l-4 border-indigo-500 pl-4">
+                <h2 class="text-3xl font-bold text-stone-800">Parte 2: Metodologias de Prompt</h2>
+                <p class="mt-2 text-stone-600">Transformando linguagem natural em comandos precisos usando Frameworks comprovados.</p>
+            </div>
+
+            <p class="text-stone-700">A qualidade da resposta de uma LLM depende diretamente da estrutura do pedido. Abaixo, exploramos três frameworks essenciais citados na literatura.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- FRAMEWORK: RACE -->
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-hover cursor-pointer" onclick="updatePromptDemo('RACE')">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-indigo-700">R.A.C.E.</h3>
+                        <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">Popular</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li><strong>R</strong>ole (Papel)</li>
+                        <li><strong>A</strong>ction (Ação)</li>
+                        <li><strong>C</strong>ontext (Contexto)</li>
+                        <li><strong>E</strong>xpectation (Expectativa)</li>
+                    </ul>
+                    <p class="mt-4 text-xs text-stone-400">Clique para testar</p>
+                </div>
+
+                <!-- FRAMEWORK: CARE -->
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-hover cursor-pointer" onclick="updatePromptDemo('CARE')">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-teal-700">C.A.R.E.</h3>
+                        <span class="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded">NNGroup</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li><strong>C</strong>ontext (Contexto)</li>
+                        <li><strong>A</strong>ction (Ação)</li>
+                        <li><strong>R</strong>esult (Resultado)</li>
+                        <li><strong>E</strong>xample (Exemplo)</li>
+                    </ul>
+                    <p class="mt-4 text-xs text-stone-400">Clique para testar</p>
+                </div>
+
+                <!-- FRAMEWORK: APE -->
+                <div class="bg-white p-6 rounded-xl border border-stone-200 card-hover cursor-pointer" onclick="updatePromptDemo('APE')">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-rose-700">A.P.E.</h3>
+                        <span class="bg-rose-100 text-rose-800 text-xs px-2 py-1 rounded">Simples</span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-stone-600">
+                        <li><strong>A</strong>ction (Ação)</li>
+                        <li><strong>P</strong>urpose (Propósito)</li>
+                        <li><strong>E</strong>xpectation (Expectativa)</li>
+                    </ul>
+                    <p class="mt-4 text-xs text-stone-400">Clique para testar</p>
+                </div>
+            </div>
+
+            <!-- Interactive Demo Box -->
+            <div class="bg-stone-800 rounded-xl p-6 text-stone-100 shadow-lg">
+                <h4 class="text-sm font-mono text-stone-400 mb-4 border-b border-stone-700 pb-2 flex justify-between">
+                    <span>SIMULADOR DE PROMPT: <span id="demo-title" class="text-white font-bold">Selecione um Framework acima</span></span>
+                    <span class="text-xs text-stone-500">LLM Simulator v1.1</span>
+                </h4>
+                
+                <!-- Nova área de input livre -->
+                <div class="mb-6 bg-stone-900 p-4 rounded border border-stone-700">
+                    <label class="text-xs font-bold text-stone-400 uppercase block mb-2">Seu Prompt Original (Livre)</label>
+                    <textarea id="user-raw-prompt" class="w-full bg-stone-800 text-stone-200 border border-stone-600 rounded p-3 text-sm focus:outline-none focus:border-indigo-500 transition-colors" rows="2" placeholder="Ex: Me dê ideias de marketing para um café..."></textarea>
+                    <p class="text-xs text-stone-500 mt-2">Digite sua ideia acima e clique nos cards (RACE, CARE, APE) para ver como a IA estruturaria seu pedido.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-xs font-bold text-stone-400 uppercase">Estrutura (Input)</label>
+                        <div id="demo-input" class="mt-2 font-mono text-sm text-emerald-400 bg-stone-900 p-4 rounded min-h-[150px] whitespace-pre-wrap">
+                            // Clique em um card acima para ver a estrutura aplicada.
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-stone-400 uppercase">Resultado Esperado (Output)</label>
+                        <div id="demo-output" class="mt-2 font-mono text-sm text-stone-300 bg-stone-900 p-4 rounded min-h-[150px]">
+                            // Aguardando input...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Segurança e Ética -->
+        <section id="seguranca" class="scroll-mt-24 space-y-8">
+            <div class="border-l-4 border-indigo-500 pl-4">
+                <h2 class="text-3xl font-bold text-stone-800">Parte 3: Segurança, Ética e Dados</h2>
+                <p class="mt-2 text-stone-600">Como as LLMs usam nossos dados e como nos proteger.</p>
+            </div>
+
+            <!-- Tabbed Interface for sub-sections -->
+            <div>
+                <div class="flex border-b border-stone-200">
+                    <button id="tab-data-btn" class="active-tab px-6 py-3 text-sm font-medium focus:outline-none" onclick="switchTab('data')">Fluxo de Dados & Privacidade</button>
+                    <button id="tab-reg-btn" class="text-stone-500 hover:text-stone-700 px-6 py-3 text-sm font-medium focus:outline-none" onclick="switchTab('reg')">Regulamentação e Riscos</button>
+                </div>
+
+                <!-- Content: Data Privacy -->
+                <div id="tab-data" class="py-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone-200">
+                        <h3 class="text-lg font-bold mb-4">Como seus dados treinam a IA?</h3>
+                        <p class="text-sm text-stone-600 mb-6">Plataformas populares (ChatGPT, Gemini) possuem políticas distintas para contas Gratuitas vs. Enterprise. Abaixo, um fluxo simplificado do uso de dados em contas <strong>padrão (gratuitas)</strong>.</p>
+                        
+                        <!-- CSS Flowchart -->
+                        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 text-center">
+                            
+                            <!-- Step 1 -->
+                            <div class="flex-1 bg-stone-50 p-4 rounded border border-stone-200 relative group">
+                                <div class="text-2xl mb-2">👤</div>
+                                <h4 class="font-bold text-sm">Input do Usuário</h4>
+                                <p class="text-xs text-stone-500 mt-1">Prompt inserido no chat</p>
+                                <!-- Arrow -->
+                                <div class="hidden md:block absolute -right-6 top-1/2 transform -translate-y-1/2 text-stone-300">➜</div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="flex-1 bg-indigo-50 p-4 rounded border border-indigo-200 relative group">
+                                <div class="text-2xl mb-2">🛡️</div>
+                                <h4 class="font-bold text-sm text-indigo-900">Filtro de PII</h4>
+                                <p class="text-xs text-indigo-700 mt-1">Remoção automática de Dados Pessoais Identificáveis (CPF, Telefones)*</p>
+                                <div class="hidden md:block absolute -right-6 top-1/2 transform -translate-y-1/2 text-stone-300">➜</div>
+                            </div>
+
+                             <!-- Step 3 -->
+                             <div class="flex-1 bg-stone-50 p-4 rounded border border-stone-200 relative group">
+                                <div class="text-2xl mb-2">💾</div>
+                                <h4 class="font-bold text-sm">Armazenamento</h4>
+                                <p class="text-xs text-stone-500 mt-1">Histórico de conversa salvo</p>
+                                <div class="hidden md:block absolute -right-6 top-1/2 transform -translate-y-1/2 text-stone-300">➜</div>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div class="flex-1 bg-emerald-50 p-4 rounded border border-emerald-200 relative">
+                                <div class="text-2xl mb-2">🤖</div>
+                                <h4 class="font-bold text-sm text-emerald-900">Treinamento</h4>
+                                <p class="text-xs text-emerald-700 mt-1">Dados anonimizados são usados para refinar modelos futuros (RLHF)</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-amber-50 rounded-lg text-sm text-amber-900 border border-amber-100">
+                            <strong>⚠️ Atenção aos dados sensíveis:</strong> Mesmo com filtros, <strong>NUNCA</strong> insira: CPFs, Senhas, Dados Bancários, Tokens de API ou Segredos Industriais. O "Opt-out" (desligar histórico) impede o uso para treinamento na maioria das plataformas.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content: Regulations -->
+                <div id="tab-reg" class="hidden py-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl border border-stone-200">
+                            <h3 class="text-lg font-bold mb-3 text-stone-800">IA Safety (Segurança)</h3>
+                            <ul class="space-y-3">
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <p class="text-sm text-stone-600"><strong>Alinhamento:</strong> Garantir que os objetivos da IA estejam alinhados aos valores humanos.</p>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <p class="text-sm text-stone-600"><strong>Mitigação de Viés:</strong> Reduzir preconceitos raciais e de gênero nos dados de treino.</p>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-2">✓</span>
+                                    <p class="text-sm text-stone-600"><strong>Alucinação:</strong> Combater a geração de fatos falsos apresentados como verdade.</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-stone-200">
+                            <h3 class="text-lg font-bold mb-3 text-stone-800">Regulação Global</h3>
+                            <p class="text-sm text-stone-600 mb-4">Principais iniciativas para conter riscos existenciais e sociais:</p>
+                            <div class="space-y-2">
+                                <div class="bg-stone-50 p-2 rounded text-sm border border-stone-100">
+                                    <strong>EU AI Act:</strong> Primeira lei abrangente do mundo sobre IA, classificando sistemas por nível de risco.
+                                </div>
+                                <div class="bg-stone-50 p-2 rounded text-sm border border-stone-100">
+                                    <strong>Executive Order (EUA):</strong> Focada em segurança nacional e testes de segurança (red-teaming) obrigatórios para modelos de fronteira.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer / Conclusion -->
+        <footer class="bg-red-900 text-red-100 rounded-2xl p-8 mt-12 mb-8 shadow-xl">
+            <h2 class="text-2xl font-serif font-bold text-white mb-4">Conclusão e Próximos Passos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <p class="mb-4 leading-relaxed text-sm">
+                        A Inteligência Artificial passou de sistemas lógicos rígidos para modelos generativos fluidos (3ª Onda). O diferencial competitivo hoje não é apenas ter acesso à ferramenta, mas dominar a comunicação com ela (Engenharia de Prompt) através de métodos estruturados como RACE e CARE.
+                    </p>
+                </div>
+                <div>
+                    <p class="mb-4 leading-relaxed text-sm">
+                        Contudo, a adoção deve ser responsável. Entender o fluxo de dados e respeitar as limitações de privacidade é crucial para organizações do terceiro setor. O futuro exige um equilíbrio entre a eficiência automatizada e a supervisão humana ética.
+                    </p>
+                </div>
+            </div>
+            <div class="border-t border-red-800 mt-6 pt-6 text-center text-xs text-red-300 space-y-2">
+                <p>Gerado para fins de pesquisa e apresentação. Baseado em fontes: DARPA, NNGroup, OpenAI Policies.</p>
+                <p>Desenvolvido por <strong class="text-white">Cátedra Sérgio Henrique Ferreira</strong></p>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- Navigation Logic ---
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+            // Close mobile menu if open
+            const menu = document.getElementById('mobile-menu');
+            if (!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function switchTab(tabId) {
+            // Hide all contents
+            document.getElementById('tab-data').classList.add('hidden');
+            document.getElementById('tab-reg').classList.add('hidden');
+            
+            // Reset button styles
+            document.getElementById('tab-data-btn').classList.remove('active-tab', 'text-indigo-600');
+            document.getElementById('tab-data-btn').classList.add('text-stone-500');
+            
+            document.getElementById('tab-reg-btn').classList.remove('active-tab', 'text-indigo-600');
+            document.getElementById('tab-reg-btn').classList.add('text-stone-500');
+
+            // Show selected
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const btn = document.getElementById('tab-' + tabId + '-btn');
+            btn.classList.add('active-tab', 'text-indigo-600');
+            btn.classList.remove('text-stone-500');
+        }
+
+        // --- Chart.js Implementation (The 3 Waves) ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('wavesChart').getContext('2d');
+            
+            const dataWaves = {
+                labels: ['1950', '1970', '1990', '2010', '2020', '2025+'],
+                datasets: [
+                    {
+                        label: '1ª Onda: Conhecimento Artesanal (Regras)',
+                        data: [10, 40, 50, 20, 10, 5],
+                        borderColor: '#6366f1', // Indigo
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: '2ª Onda: Aprendizado Estatístico (Percepção)',
+                        data: [0, 5, 20, 80, 70, 60],
+                        borderColor: '#94a3b8', // Slate 400
+                        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: '3ª Onda: Adaptação Contextual (Generativa)',
+                        data: [0, 0, 0, 10, 95, 100],
+                        borderColor: '#10b981', // Emerald
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            };
+
+            const waveInfoData = {
+                0: {
+                    title: "1ª Onda: Conhecimento Artesanal",
+                    desc: "Sistemas especialistas baseados em regras 'se-então'. Ótimos para raciocínio lógico bem definido (ex: Xadrez, Diagnóstico simples), mas falham em lidar com a ambiguidade do mundo real. Não aprendem, apenas executam o que foi programado."
+                },
+                1: {
+                    title: "2ª Onda: Aprendizado Estatístico",
+                    desc: "Machine Learning e Redes Neurais. Excelentes em percepção (reconhecer rostos, vozes) e classificação estatística. Dependem de enormes quantidades de dados ('Big Data') e treinamento específico. Têm dificuldade em explicar 'por que' tomaram uma decisão."
+                },
+                2: {
+                    title: "3ª Onda: Adaptação Contextual",
+                    desc: "O momento atual. Sistemas que não apenas classificam, mas geram e adaptam. Entendem contexto e nuances (LLMs). O foco é a capacidade de explicar o raciocínio e adaptar-se a novas situações com poucos dados (Zero-shot learning)."
+                }
+            };
+
+            const wavesChart = new Chart(ctx, {
+                type: 'line',
+                data: dataWaves,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: true,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            onClick: (e, legendItem, legend) => {
+                                const index = legendItem.datasetIndex;
+                                updateWaveInfo(index);
+                                Chart.defaults.plugins.legend.onClick(e, legendItem, legend);
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label;
+                                }
+                            }
+                        }
+                    },
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const datasetIndex = elements[0].datasetIndex;
+                            updateWaveInfo(datasetIndex);
+                        }
+                    },
+                    scales: {
+                        y: {
+                            display: false,
+                            title: { display: true, text: 'Capacidade' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            function updateWaveInfo(index) {
+                const infoBox = document.getElementById('wave-info');
+                const data = waveInfoData[index];
+                if(data) {
+                    infoBox.innerHTML = `
+                        <h4 class="text-xl font-bold text-indigo-600 mb-3">${data.title}</h4>
+                        <p class="text-stone-600 leading-relaxed">${data.desc}</p>
+                    `;
+                }
+            }
+        });
+
+        // --- Prompt Framework Demo Logic ---
+        function getDynamicPromptData(framework, userInput) {
+            // Usa o texto do usuário ou um texto padrão se estiver vazio
+            const baseText = userInput.trim() || "Me dê ideias de marketing para um café";
+            
+            if (framework === 'RACE') {
+                return {
+                    title: 'R.A.C.E. Framework',
+                    input: `<span class="text-indigo-400">Role (Papel):</span> Aja como um especialista sênior no assunto.\n<span class="text-indigo-400">Action (Ação):</span> ${baseText}\n<span class="text-indigo-400">Context (Contexto):</span> O público precisa de informações claras, aplicáveis e com orçamento otimizado.\n<span class="text-indigo-400">Expectation (Expectativa):</span> Forneça a resposta em formato de lista estruturada e direta ao ponto.`,
+                    output: `[Simulação otimizada para: "${baseText}"]\n\n1. **Análise Inicial:** Compreendendo o cenário proposto...\n2. **Estratégia:** Aplicando as melhores práticas do mercado...\n3. **Execução:** Passos práticos para atingir o objetivo com eficiência.`
+                };
+            } else if (framework === 'CARE') {
+                return {
+                    title: 'C.A.R.E. Framework',
+                    input: `<span class="text-teal-400">Context (Contexto):</span> Tenho a seguinte necessidade: ${baseText}\n<span class="text-teal-400">Action (Ação):</span> Desenvolva uma solução ou resposta detalhada para isso.\n<span class="text-teal-400">Result (Resultado):</span> O resultado deve ser prático, empático e fácil de entender.\n<span class="text-teal-400">Example (Exemplo):</span> Use um tom profissional e didático, semelhante a um artigo da Harvard Business Review.`,
+                    output: `[Simulação otimizada para: "${baseText}"]\n\n"Para resolver essa questão de forma prática, podemos focar em três pilares principais. Por exemplo, se aplicarmos a técnica adequada, o resultado esperado será uma melhoria significativa na sua abordagem..."`
+                };
+            } else if (framework === 'APE') {
+                return {
+                    title: 'A.P.E. Framework',
+                    input: `<span class="text-rose-400">Action (Ação):</span> ${baseText}\n<span class="text-rose-400">Purpose (Propósito):</span> Para resolver um problema específico de forma rápida e objetiva.\n<span class="text-rose-400">Expectation (Expectativa):</span> Vá direto ao ponto, sem introduções longas, usando no máximo 3 frases ou bullet points.`,
+                    output: `[Simulação otimizada para: "${baseText}"]\n\nAqui está a solução direta:\n- Foco na ação principal.\n- Eliminação de ruídos no processo.\n- Resultado imediato.`
+                };
+            }
+        }
+
+        function updatePromptDemo(framework) {
+            const userInput = document.getElementById('user-raw-prompt').value;
+            const data = getDynamicPromptData(framework, userInput);
+            
+            document.getElementById('demo-title').innerText = data.title;
+            document.getElementById('demo-input').innerHTML = data.input;
+            document.getElementById('demo-output').innerText = "Estruturando e gerando resposta simulada...";
+            
+            // Simulate typing delay
+            setTimeout(() => {
+                document.getElementById('demo-output').innerText = data.output;
+            }, 600);
+        }
+
+    </script>
+</body>
+</html>
