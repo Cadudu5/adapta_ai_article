@@ -269,8 +269,35 @@ function fillRandomPrompt() {
         }
     }
     
-    // Atualiza a interface com os novos dados
-    updatePromptDemo(currentFramework);
+    // Atualiza a interface com os novos dados, passando true para pular o salvamento do estado atual
+    updatePromptDemo(currentFramework, true);
+}
+
+// Limpa todos os campos de texto e o estado global
+function clearPromptFields() {
+    // Reseta o estado global
+    promptState.role = '';
+    promptState.action = '';
+    promptState.context = '';
+    promptState.expectation = '';
+    promptState.example = '';
+    
+    // Se houver um framework selecionado, atualiza a interface para refletir os campos vazios
+    // Passamos true para pular o salvamento do estado atual (que leria os campos preenchidos)
+    if (currentFramework) {
+        updatePromptDemo(currentFramework, true);
+    }
+    
+    // Limpa a área de resultado simulado
+    const outputElement = document.getElementById('demo-output');
+    if (outputElement) {
+        outputElement.innerText = "// Preencha os blocos acima e clique em 'Gerar Resposta Simulada'.";
+    }
+    
+    // Para qualquer animação de digitação que esteja acontecendo
+    if (typingInterval) {
+        clearInterval(typingInterval);
+    }
 }
 
 // 1. Nova função para detectar o tema baseada no CSV
@@ -335,8 +362,10 @@ function saveCurrentState() {
 }
 
 // Renderiza os campos de input baseados no framework selecionado
-function updatePromptDemo(framework) {
-    saveCurrentState(); // Salva o que estava digitado
+function updatePromptDemo(framework, skipSave = false) {
+    if (!skipSave) {
+        saveCurrentState(); // Salva o que estava digitado apenas se não for um preenchimento forçado
+    }
     currentFramework = framework;
     
     const titleMap = { 'RACE': 'R.A.C.E. Framework', 'CARE': 'C.A.R.E. Framework', 'APE': 'A.P.E. Framework' };

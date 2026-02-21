@@ -256,9 +256,14 @@
                 <div class="mb-6 bg-stone-900 p-4 rounded border border-stone-700">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                         <p class="text-xs text-stone-400">Preencha os blocos abaixo para construir seu prompt estruturado. Os campos se adaptam ao framework escolhido.</p>
-                        <button onclick="fillRandomPrompt()" class="text-xs bg-stone-700 hover:bg-stone-600 text-stone-200 py-1.5 px-3 rounded transition-colors flex items-center gap-1 whitespace-nowrap">
-                            🎲 Exemplo Aleatório
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="clearPromptFields()" class="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-600 py-1.5 px-3 rounded transition-colors flex items-center gap-1 whitespace-nowrap">
+                                🗑️ Limpar
+                            </button>
+                            <button onclick="fillRandomPrompt()" class="text-xs bg-stone-700 hover:bg-stone-600 text-stone-200 py-1.5 px-3 rounded transition-colors flex items-center gap-1 whitespace-nowrap">
+                                🎲 Exemplo Aleatório
+                            </button>
+                        </div>
                     </div>
                     <div id="prompt-builder" class="space-y-3">
                         <!-- Os campos de input serão injetados aqui via JavaScript -->
