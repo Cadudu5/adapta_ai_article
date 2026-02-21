@@ -178,6 +178,7 @@ const frameworkConfig = {
 
 // Variável global para armazenar a base de conhecimento do CSV
 let knowledgeBase = [];
+let mockPrompts = [];
 
 // Função para carregar e processar o CSV ao iniciar a página
 async function loadKnowledgeBase() {
@@ -206,8 +207,71 @@ async function loadKnowledgeBase() {
     }
 }
 
-// Chama a função assim que o script carrega
+// Função para carregar os prompts de exemplo
+async function loadMockPrompts() {
+    try {
+        const response = await fetch('data/mock_prompts.csv');
+        const csvText = await response.text();
+        
+        const lines = csvText.split('\n').filter(line => line.trim() !== '');
+        
+        mockPrompts = lines.slice(1).map(line => {
+            const [role, action, context, expectation, example] = line.split(';');
+            return {
+                role: role ? role.trim() : '',
+                action: action ? action.trim() : '',
+                context: context ? context.trim() : '',
+                expectation: expectation ? expectation.trim() : '',
+                example: example ? example.trim() : ''
+            };
+        });
+        console.log("Prompts de exemplo carregados com sucesso!", mockPrompts);
+    } catch (error) {
+        console.error("Erro ao carregar mock_prompts.csv", error);
+    }
+}
+
+// Chama as funções assim que o script carrega
 loadKnowledgeBase();
+loadMockPrompts();
+
+// Preenche os campos com um prompt aleatório
+function fillRandomPrompt() {
+    if (mockPrompts.length === 0) {
+        alert("Os exemplos ainda estão carregando ou houve um erro ao ler o arquivo.");
+        return;
+    }
+    
+    // Escolhe um prompt aleatório da lista
+    const randomIndex = Math.floor(Math.random() * mockPrompts.length);
+    const randomPrompt = mockPrompts[randomIndex];
+    
+    // Atualiza o estado global
+    promptState.role = randomPrompt.role;
+    promptState.action = randomPrompt.action;
+    promptState.context = randomPrompt.context;
+    promptState.expectation = randomPrompt.expectation;
+    promptState.example = randomPrompt.example;
+    
+    // Se nenhum framework estiver selecionado, seleciona o RACE por padrão
+    if (!currentFramework) {
+        currentFramework = 'RACE';
+        
+        // Atualiza visualmente os botões de framework
+        document.querySelectorAll('.framework-btn').forEach(btn => {
+            btn.classList.remove('bg-red-600', 'text-white');
+            btn.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        const raceBtn = document.querySelector('button[onclick="updatePromptDemo(\'RACE\')"]');
+        if (raceBtn) {
+            raceBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            raceBtn.classList.add('bg-red-600', 'text-white');
+        }
+    }
+    
+    // Atualiza a interface com os novos dados
+    updatePromptDemo(currentFramework);
+}
 
 // 1. Nova função para detectar o tema baseada no CSV
 function detectTheme(text) {

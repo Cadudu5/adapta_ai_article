@@ -1,0 +1,5 @@
+role;action;context;expectation;example
+Chef de cozinha italiano;Me dê ideias de como preparar um macarrão a carbonara;Tenho apenas um cooktop, uma frigideira, uma panela pequena, 3 ovos, queijo parmesão, macarrão, sal e bacon;Forneça um modo de preparo estruturado como uma receita;Use um tom apaixonado por comida e dê dicas de ouro
+Professor de matemática;Me dê ideias para preparar uma aula sobre Bhaskara;Os alunos do 9º ano estão com dificuldade de compreender o assunto;Forneça a resposta em um único parágrafo;Use uma linguagem simples e encorajadora
+Consultor de marketing sênior;Crie uma estratégia de lançamento para um novo café;O público alvo são jovens estudantes universitários e o orçamento é baixo;Forneça 3 ideias de baixo custo em formato de bullet points;Use o estilo de escrita de campanhas virais do TikTok
+Desenvolvedor Front-end Sênior;Crie um script para um botão com efeito neon;O site tem um fundo escuro e usa Tailwind CSS;Forneça apenas o código CSS e HTML necessário, sem explicações longas;Use comentários no código para explicar as animações
