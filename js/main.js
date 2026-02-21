@@ -141,65 +141,201 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// --- Prompt Framework Demo Logic ---
-function getDynamicPromptData(framework, userInput) {
-    // Usa o texto do usuário ou um texto padrão se estiver vazio
-    const baseText = userInput.trim() || "Me dê ideias de marketing para um café";
-    
-    if (framework === 'RACE') {
-        return {
-            title: 'R.A.C.E. Framework',
-            input: `<span class="text-indigo-400">Role (Papel):</span> Aja como um especialista sênior no assunto.\n<span class="text-indigo-400">Action (Ação):</span> ${baseText}\n<span class="text-indigo-400">Context (Contexto):</span> O público precisa de informações claras, aplicáveis e com orçamento otimizado.\n<span class="text-indigo-400">Expectation (Expectativa):</span> Forneça a resposta em formato de lista estruturada e direta ao ponto.`,
-            output: `[Simulação otimizada para: "${baseText}"]\n\n1. **Análise Inicial:** Compreendendo o cenário proposto...\n2. **Estratégia:** Aplicando as melhores práticas do mercado...\n3. **Execução:** Passos práticos para atingir o objetivo com eficiência.`
-        };
-    } else if (framework === 'CARE') {
-        return {
-            title: 'C.A.R.E. Framework',
-            input: `<span class="text-teal-400">Context (Contexto):</span> Tenho a seguinte necessidade: ${baseText}\n<span class="text-teal-400">Action (Ação):</span> Desenvolva uma solução ou resposta detalhada para isso.\n<span class="text-teal-400">Result (Resultado):</span> O resultado deve ser prático, empático e fácil de entender.\n<span class="text-teal-400">Example (Exemplo):</span> Use um tom profissional e didático, semelhante a um artigo da Harvard Business Review.`,
-            output: `[Simulação otimizada para: "${baseText}"]\n\n"Para resolver essa questão de forma prática, podemos focar em três pilares principais. Por exemplo, se aplicarmos a técnica adequada, o resultado esperado será uma melhoria significativa na sua abordagem..."`
-        };
-    } else if (framework === 'APE') {
-        return {
-            title: 'A.P.E. Framework',
-            input: `<span class="text-rose-400">Action (Ação):</span> ${baseText}\n<span class="text-rose-400">Purpose (Propósito):</span> Para resolver um problema específico de forma rápida e objetiva.\n<span class="text-rose-400">Expectation (Expectativa):</span> Vá direto ao ponto, sem introduções longas, usando no máximo 3 frases ou bullet points.`,
-            output: `[Simulação otimizada para: "${baseText}"]\n\nAqui está a solução direta:\n- Foco na ação principal.\n- Eliminação de ruídos no processo.\n- Resultado imediato.`
-        };
+// --- Prompt Framework Demo Logic (v2.0 - Construtor de Blocos) ---
+
+// Estado Global para armazenar os dados do usuário entre as trocas de framework
+const promptState = {
+    role: '',
+    action: '',
+    context: '',
+    expectation: '',
+    example: ''
+};
+
+let currentFramework = '';
+let typingInterval;
+
+// Definição dos campos necessários para cada framework
+const frameworkConfig = {
+    'RACE': [
+        { id: 'role', label: 'Role (Papel)', placeholder: 'Ex: Você é um professor de matemática...', color: 'text-indigo-400' },
+        { id: 'action', label: 'Action (Ação)', placeholder: 'Ex: Me dê ideias para preparar uma aula sobre Bhaskara...', color: 'text-indigo-400' },
+        { id: 'context', label: 'Context (Contexto)', placeholder: 'Ex: Os alunos do 9º ano estão com dificuldade...', color: 'text-indigo-400' },
+        { id: 'expectation', label: 'Expectation (Expectativa)', placeholder: 'Ex: Forneça a resposta em um único parágrafo.', color: 'text-indigo-400' }
+    ],
+    'CARE': [
+        { id: 'context', label: 'Context (Contexto)', placeholder: 'Ex: Sendo um professor, os alunos estão com dificuldade...', color: 'text-teal-400' },
+        { id: 'action', label: 'Action (Ação)', placeholder: 'Ex: Me dê ideias para preparar uma aula sobre Bhaskara...', color: 'text-teal-400' },
+        { id: 'expectation', label: 'Result (Resultado)', placeholder: 'Ex: Forneça a resposta em um único parágrafo.', color: 'text-teal-400' },
+        { id: 'example', label: 'Example (Exemplo)', placeholder: 'Ex: Use uma linguagem simples e encorajadora.', color: 'text-teal-400' }
+    ],
+    'APE': [
+        { id: 'action', label: 'Action (Ação)', placeholder: 'Ex: Me dê ideias para preparar uma aula sobre Bhaskara...', color: 'text-rose-400' },
+        { id: 'context', label: 'Purpose (Propósito)', placeholder: 'Ex: Para ajudar alunos do 9º ano com dificuldade...', color: 'text-rose-400' },
+        { id: 'expectation', label: 'Expectation (Expectativa)', placeholder: 'Ex: Forneça a resposta em um único parágrafo.', color: 'text-rose-400' }
+    ]
+};
+
+// Variável global para armazenar a base de conhecimento do CSV
+let knowledgeBase = [];
+
+// Função para carregar e processar o CSV ao iniciar a página
+async function loadKnowledgeBase() {
+    try {
+        const response = await fetch('data/themes.csv');
+        const csvText = await response.text();
+        
+        // Divide o CSV em linhas e remove linhas vazias
+        const lines = csvText.split('\n').filter(line => line.trim() !== '');
+        
+        // Pula o cabeçalho (índice 0) e mapeia os dados
+        knowledgeBase = lines.slice(1).map(line => {
+            const [tema, palavras_chave, emoji, passo1, passo2, passo3] = line.split(';');
+            return {
+                tema: tema ? tema.trim() : '',
+                palavras: palavras_chave ? palavras_chave.split(',').map(p => p.trim().toLowerCase()) : [],
+                emoji: emoji ? emoji.trim() : '',
+                passo1: passo1 ? passo1.trim() : '',
+                passo2: passo2 ? passo2.trim() : '',
+                passo3: passo3 ? passo3.trim() : ''
+            };
+        });
+        console.log("Base de conhecimento carregada com sucesso!", knowledgeBase);
+    } catch (error) {
+        console.error("Erro ao carregar o CSV. Verifique se está rodando em um servidor local.", error);
     }
 }
 
-let typingInterval; // Variável global para controlar o efeito de digitação
+// Chama a função assim que o script carrega
+loadKnowledgeBase();
 
-function updatePromptDemo(framework) {
-    const userInput = document.getElementById('user-raw-prompt').value;
-    const data = getDynamicPromptData(framework, userInput);
+// 1. Nova função para detectar o tema baseada no CSV
+function detectTheme(text) {
+    if (!text || knowledgeBase.length === 0) return null;
+    const lowerText = text.toLowerCase();
     
-    document.getElementById('demo-title').innerText = data.title;
-    document.getElementById('demo-input').innerHTML = data.input;
+    // Procura na base de conhecimento qual tema tem as palavras digitadas
+    for (const item of knowledgeBase) {
+        if (item.palavras.some(palavra => lowerText.includes(palavra))) {
+            return item; // Retorna o objeto completo do tema encontrado
+        }
+    }
+    return null; // Retorna null se não achar nada (cai no fallback geral)
+}
+
+// 2. Nova função para gerar a resposta usando os dados do CSV
+function generateSmartOutput(framework) {
+    // Resgata os valores digitados pelo usuário
+    const action = promptState.action || "sua solicitação";
+    const context = promptState.context || "o cenário atual";
+    const expectation = promptState.expectation || "a melhor forma possível";
+    
+    // Junta os textos para tentar adivinhar o tema
+    const fullText = `${action} ${context}`;
+    const themeData = detectTheme(fullText);
+    
+    let output = `[Simulação baseada na estrutura ${framework}]\n\n`;
+    output += `Entendido! Analisando seu pedido principal: "${action}"...\n\n`;
+
+    if (themeData) {
+        // Substitui as tags {context} e {expectation} pelo texto do usuário
+        const p1 = themeData.passo1.replace('{context}', context);
+        const p3 = themeData.passo3.replace('{expectation}', expectation);
+
+        output += `${themeData.emoji} **Abordagem Focada (${themeData.tema}):**\n`;
+        output += `1. **Análise:** ${p1}\n`;
+        output += `2. **Execução:** ${themeData.passo2}\n`;
+        output += `3. **Resultado:** ${p3}`;
+    } else {
+        // Fallback Geral
+        output += `⚙️ **Plano de Execução:**\n`;
+        output += `1. **Análise Inicial:** Focando no contexto fornecido (${context}), a melhor estratégia é organizar as ideias.\n`;
+        output += `2. **Aplicação Prática:** Vamos desenvolver a solução passo a passo, direto ao ponto.\n`;
+        output += `3. **Resultado:** Seguindo a expectativa definida ("${expectation}"), esta estrutura garante maior clareza e precisão.`;
+    }
+
+    return output;
+}
+
+// Atualiza o estado global com o que o usuário digitou antes de trocar de framework
+function saveCurrentState() {
+    if (!currentFramework) return;
+    
+    const config = frameworkConfig[currentFramework];
+    config.forEach(field => {
+        const inputEl = document.getElementById(`input-${field.id}`);
+        if (inputEl) {
+            promptState[field.id] = inputEl.value;
+        }
+    });
+}
+
+// Renderiza os campos de input baseados no framework selecionado
+function updatePromptDemo(framework) {
+    saveCurrentState(); // Salva o que estava digitado
+    currentFramework = framework;
+    
+    const titleMap = { 'RACE': 'R.A.C.E. Framework', 'CARE': 'C.A.R.E. Framework', 'APE': 'A.P.E. Framework' };
+    document.getElementById('demo-title').innerText = titleMap[framework];
+    
+    const builderContainer = document.getElementById('prompt-builder');
+    builderContainer.innerHTML = ''; // Limpa os campos antigos
+    
+    const config = frameworkConfig[framework];
+    
+    config.forEach(field => {
+        // Lógica de adaptação (De/Para) ao trocar de framework
+        let valueToFill = promptState[field.id] || '';
+        
+        // Adaptação específica para o CARE (junta Role no Contexto se o Contexto estiver vazio)
+        if (framework === 'CARE' && field.id === 'context' && !valueToFill && promptState.role) {
+            valueToFill = `Sendo ${promptState.role.replace(/Você é um |Você é uma |Aja como /i, '')}, ${promptState.context}`;
+        }
+
+        const fieldHtml = `
+            <div class="flex flex-col">
+                <label class="text-xs font-bold ${field.color} mb-1">${field.label}</label>
+                <textarea id="input-${field.id}" class="w-full bg-stone-800 text-stone-200 border border-stone-600 rounded p-2 text-sm focus:outline-none focus:border-indigo-500 transition-colors" rows="2" placeholder="${field.placeholder}">${valueToFill}</textarea>
+            </div>
+        `;
+        builderContainer.innerHTML += fieldHtml;
+    });
+
+    // Mostra o botão de simular
+    document.getElementById('btn-simulate').classList.remove('hidden');
+    
+    // Limpa o output anterior
+    document.getElementById('demo-output').innerText = "// Preencha os blocos acima e clique em 'Gerar Resposta Simulada'.";
+    if (typingInterval) clearInterval(typingInterval);
+}
+
+// Gera a resposta simulada baseada nos campos preenchidos
+function generateSimulation() {
+    saveCurrentState(); // Garante que o estado mais recente está salvo
     
     const outputElement = document.getElementById('demo-output');
-    outputElement.innerText = "Estruturando e gerando resposta simulada...";
+    outputElement.innerText = "Processando blocos e gerando resposta simulada...";
     
-    // Limpa qualquer digitação anterior se o usuário clicar rápido em outro card
     if (typingInterval) clearInterval(typingInterval);
     
-    // Simula o tempo de processamento inicial
     setTimeout(() => {
-        outputElement.innerText = ""; // Limpa o texto de carregamento
+        outputElement.innerText = ""; 
         let i = 0;
-        const text = data.output;
         
-        // Efeito de digitação (Typewriter)
+        // CHAMA A NOVA FUNÇÃO AQUI
+        const simulatedResponse = generateSmartOutput(currentFramework); 
+        
         typingInterval = setInterval(() => {
-            if (i < text.length) {
-                if (text.charAt(i) === '\n') {
+            if (i < simulatedResponse.length) {
+                if (simulatedResponse.charAt(i) === '\n') {
                     outputElement.appendChild(document.createElement('br'));
                 } else {
-                    outputElement.appendChild(document.createTextNode(text.charAt(i)));
+                    outputElement.appendChild(document.createTextNode(simulatedResponse.charAt(i)));
                 }
                 i++;
             } else {
                 clearInterval(typingInterval);
             }
-        }, 20); // Velocidade da digitação (20ms por caractere)
+        }, 15); // Velocidade ajustada para 15ms
     }, 600);
 }

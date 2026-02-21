@@ -54,3 +54,83 @@ body {
     transform: translateX(-50%);
     z-index: 0;
 }
+
+/* Glow Effect for Generate Button */
+.btn-glow {
+    position: relative;
+    background-color: #000000;
+    color: #ffffff;
+    font-weight: bold;
+    border: none;
+    z-index: 1;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.btn-glow span {
+    position: absolute;
+    display: block;
+}
+
+/* Top Border */
+.btn-glow span:nth-child(1) {
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ff0000);
+    animation: btn-anim1 2s linear infinite;
+}
+
+@keyframes btn-anim1 {
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
+}
+
+/* Right Border */
+.btn-glow span:nth-child(2) {
+    top: -100%;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, #0000ff);
+    animation: btn-anim2 2s linear infinite;
+    animation-delay: 0.5s;
+}
+
+@keyframes btn-anim2 {
+    0% { top: -100%; }
+    50%, 100% { top: 100%; }
+}
+
+/* Bottom Border */
+.btn-glow span:nth-child(3) {
+    bottom: 0;
+    right: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(270deg, transparent, #ff0000);
+    animation: btn-anim3 2s linear infinite;
+    animation-delay: 1s;
+}
+
+@keyframes btn-anim3 {
+    0% { right: -100%; }
+    50%, 100% { right: 100%; }
+}
+
+/* Left Border */
+.btn-glow span:nth-child(4) {
+    bottom: -100%;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(360deg, transparent, #0000ff);
+    animation: btn-anim4 2s linear infinite;
+    animation-delay: 1.5s;
+}
+
+@keyframes btn-anim4 {
+    0% { bottom: -100%; }
+    50%, 100% { bottom: 100%; }
+}
