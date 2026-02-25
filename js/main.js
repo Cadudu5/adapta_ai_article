@@ -291,7 +291,7 @@ function clearPromptFields() {
     // Limpa a área de resultado simulado
     const outputElement = document.getElementById('demo-output');
     if (outputElement) {
-        outputElement.innerText = "// Preencha os blocos acima e clique em 'Gerar Resposta Simulada'.";
+        outputElement.innerText = "// Preencha os blocos acima e clique em 'Gerar Prompt'.";
     }
     
     // Para qualquer animação de digitação que esteja acontecendo
@@ -314,38 +314,27 @@ function detectTheme(text) {
     return null; // Retorna null se não achar nada (cai no fallback geral)
 }
 
-// 2. Nova função para gerar a resposta usando os dados do CSV
+// 2. Nova função que agora retorna o PROMPT ESTRUTURADO (concatenação dos inputs)
 function generateSmartOutput(framework) {
-    // Resgata os valores digitados pelo usuário
-    const action = promptState.action || "sua solicitação";
-    const context = promptState.context || "o cenário atual";
-    const expectation = promptState.expectation || "a melhor forma possível";
-    
-    // Junta os textos para tentar adivinhar o tema
-    const fullText = `${action} ${context}`;
-    const themeData = detectTheme(fullText);
-    
-    let output = `[Simulação baseada na estrutura ${framework}]\n\n`;
-    output += `Entendido! Analisando seu pedido principal: "${action}"...\n\n`;
+    const config = frameworkConfig[framework];
+    if (!config) return "Erro: Framework não identificado.";
 
-    if (themeData) {
-        // Substitui as tags {context} e {expectation} pelo texto do usuário
-        const p1 = themeData.passo1.replace('{context}', context);
-        const p3 = themeData.passo3.replace('{expectation}', expectation);
+    let structuredPrompt = "";
 
-        output += `${themeData.emoji} **Abordagem Focada (${themeData.tema}):**\n`;
-        output += `1. **Análise:** ${p1}\n`;
-        output += `2. **Execução:** ${themeData.passo2}\n`;
-        output += `3. **Resultado:** ${p3}`;
-    } else {
-        // Fallback Geral
-        output += `⚙️ **Plano de Execução:**\n`;
-        output += `1. **Análise Inicial:** Focando no contexto fornecido (${context}), a melhor estratégia é organizar as ideias.\n`;
-        output += `2. **Aplicação Prática:** Vamos desenvolver a solução passo a passo, direto ao ponto.\n`;
-        output += `3. **Resultado:** Seguindo a expectativa definida ("${expectation}"), esta estrutura garante maior clareza e precisão.`;
+    // Itera sobre a configuração do framework atual e concatena os valores
+    config.forEach(field => {
+        const value = promptState[field.id];
+        if (value && value.trim() !== "") {
+            // Adiciona o valor do campo e duas quebras de linha para separação visual
+            structuredPrompt += `${value.trim()}\n\n`;
+        }
+    });
+
+    if (structuredPrompt === "") {
+        return "Por favor, preencha os campos acima para gerar o prompt.";
     }
 
-    return output;
+    return structuredPrompt.trim();
 }
 
 // Atualiza o estado global com o que o usuário digitou antes de trocar de framework
@@ -398,7 +387,7 @@ function updatePromptDemo(framework, skipSave = false) {
     document.getElementById('btn-simulate').classList.remove('hidden');
     
     // Limpa o output anterior
-    document.getElementById('demo-output').innerText = "// Preencha os blocos acima e clique em 'Gerar Resposta Simulada'.";
+    document.getElementById('demo-output').innerText = "// Preencha os blocos acima e clique em 'Gerar Prompt'.";
     if (typingInterval) clearInterval(typingInterval);
 }
 
@@ -407,7 +396,7 @@ function generateSimulation() {
     saveCurrentState(); // Garante que o estado mais recente está salvo
     
     const outputElement = document.getElementById('demo-output');
-    outputElement.innerText = "Processando blocos e gerando resposta simulada...";
+    outputElement.innerText = "Organizando e estruturando seu prompt...";
     
     if (typingInterval) clearInterval(typingInterval);
     
